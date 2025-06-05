@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from torchvision import transforms
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torchvision import models
 
 from PIL import Image
@@ -41,8 +42,11 @@ backbone.fc = nn.Sequential(
 
 
 # Carregando modelo
-classification_model = torch.load('./models/classification_model_v3', weights_only=False,  map_location=torch.device('cpu'))
-# classification_model.eval()
+model = torch.load('./models/classification_model_v4', weights_only=False,  map_location=torch.device('cpu'))
+model.eval()
+
+# Threshold de confiança
+confidence_threshold = 0.7
 
 app = Flask(__name__)
 
@@ -74,12 +78,23 @@ def prediction():
         input_tensor = transform(image).unsqueeze(0)  # [1, 3, 512, 512]
 
         # Predição
-        with torch.no_grad():
-            output = classification_model(input_tensor)
-            pred_idx = output.argmax(dim=1).item()
-            pred_class = class_mapping.get(pred_idx, 'Unknown')
+        # Inferência com inference_mode (mais rápido e leve)
+        with torch.inference_mode():
+            output = model(input_tensor)
+            probs = F.softmax(output, dim=1)
+            confidence, pred_idx = torch.max(probs, 1)
+            confidence = confidence.item()
+            pred_idx = pred_idx.item()
 
-        return jsonify({'prediction': pred_class})
+            if confidence < confidence_threshold:
+                pred_class = 'uncertain'
+            else:
+                pred_class = class_mapping.get(pred_idx, 'Unknown')
+
+        return jsonify({
+            'prediction': pred_class,
+            'confidence': round(confidence, 4)
+        })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
