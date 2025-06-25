@@ -1,4 +1,4 @@
 Flask>=2.0.0
-torch==1.13.1+cpu
-torchvision==0.14.1+cpu
 Pillow>=9.0.0
+flask-cors>=3.0.10
+numpy==1.23.5
