@@ -5,7 +5,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models
 from flask_cors import CORS
-
 from PIL import Image
 import io
 
