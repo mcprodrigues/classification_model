@@ -1,4 +1,4 @@
 Flask>=2.0.0
-torch>=1.13.0
-torchvision>=0.14.0
+torch==1.13.1+cpu
+torchvision==0.14.1+cpu
 Pillow>=9.0.0
