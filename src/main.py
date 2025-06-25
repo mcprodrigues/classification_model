@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models
+from flask_cors import CORS
 
 from PIL import Image
 import io
@@ -49,6 +50,8 @@ model.eval()
 confidence_threshold = 0.7
 
 app = Flask(__name__)
+CORS(app)
+
 
 @app.route('/')
 def home():
@@ -100,4 +103,5 @@ def prediction():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    
