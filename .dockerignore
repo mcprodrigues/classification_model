@@ -17,5 +17,4 @@ notebooks/
 *.h5
 *.pth
 *.ckpt
-models/
 data/
